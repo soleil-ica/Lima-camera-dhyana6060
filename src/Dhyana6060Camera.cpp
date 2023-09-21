@@ -516,7 +516,7 @@ void Camera::setSensorTemperatureTarget(double temp)
 
 	TUCAMRET err;
 	TUCAM_ELEMENT node; // Property node
-	node.nVal = temp;
+	node.dbVal = temp;
 	node.pName = "SetSensorTemperature";
 	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 	if(TUCAMRET_SUCCESS != err)
@@ -532,7 +532,13 @@ void Camera::setSensorTemperatureTarget(double temp)
 void Camera::getSensorTemperatureTarget(double& temp)
 {
 	DEB_MEMBER_FUNCT();
-	temp = m_temperature_target;
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "SetSensorTemperature");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read SensorTemperature from the camera ! Error: " << err << " ";
+	}
+	temp = node.dbVal;
 }
 
 //-----------------------------------------------------
@@ -548,6 +554,7 @@ void Camera::getSensorTemperature(double& temp)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read SensorTemperature from the camera ! Error: " << err << " ";
 	}
+	temp = node.dbVal;
 	/*err = TUCAM_GenICam_ElementAttrNext(m_opCam.hIdxTUCam, &node, node.pName);
 	while(TUCAMRET_SUCCESS == err)
 	{
@@ -559,7 +566,6 @@ void Camera::getSensorTemperature(double& temp)
 		DEB_TRACE() << node.pName;
 		err = TUCAM_GenICam_ElementAttrNext(m_opCam.hIdxTUCam, &node, node.pName);
 	}*/
-	temp = node.dbVal;
 }
 
 //-----------------------------------------------------
@@ -591,7 +597,7 @@ void Camera::getSensorCoolingType(unsigned& type)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read SensorCoolingType from the camera ! Error: " << err << " ";
 	}
-	type = node.dbVal;
+	type = node.nVal;
 }
 
 //-----------------------------------------------------
@@ -602,7 +608,7 @@ void Camera::setFanSpeed(unsigned speed)
 	DEB_MEMBER_FUNCT();
 	TUCAMRET err;
 	TUCAM_ELEMENT node; // Property node
-	node.nVal = speed;
+	node.dbVal = speed;
 	node.pName = "FanSpeed";
 	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 	if(TUCAMRET_SUCCESS != err)
@@ -655,7 +661,7 @@ void Camera::getFanType(unsigned& type)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read FanType from the camera ! Error: " << err << " ";
 	}
-	type = node.dbVal;
+	type = node.nVal;
 }
 
 //-----------------------------------------------------
@@ -687,7 +693,7 @@ void Camera::getGlobalGain(unsigned& gain)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read GlobalGain from the camera ! Error: " << err << " ";
 	}
-	gain = node.dbVal;
+	gain = node.nVal;
 }
 
 //-----------------------------------------------------
