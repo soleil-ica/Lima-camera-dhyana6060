@@ -28,13 +28,13 @@
 #define DHYANA6060COMPATIBILITY_H
 
 #ifdef WIN32
-#ifdef LIBDHYANA_EXPORTS
-#define LIBDHYANA_API __declspec(dllexport)
+#ifdef LIBDHYANA6060_EXPORTS
+#define LIBDHYANA6060_API __declspec(dllexport)
 #else
-#define LIBDHYANA_API __declspec(dllimport)
+#define LIBDHYANA6060_API __declspec(dllimport)
 #endif
 #else  /* Unix */
-#define LIBDHYANA_API
+#define LIBDHYANA6060_API
 #endif
 
 #endif

@@ -22,7 +22,7 @@
 //
 // DhyanaRoiCtrlObj.h
 // Created on: August 09, 2023
-// Author: Arafat NOUREDDINE
+// Author: Marc DESGRANGES
 
 #ifndef DHYANA6060ROICTRLOBJ_H
 #define DHYANA6060ROICTRLOBJ_H

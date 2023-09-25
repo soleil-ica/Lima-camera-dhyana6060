@@ -22,7 +22,7 @@
 //
 // DhyanaCamera.h
 // Created on: August 09, 2023
-// Author: Arafat NOUREDDINE
+// Author: Marc DESGRANGES
 
 #ifndef DHYANA6060CAMERA_H_
 #define DHYANA6060CAMERA_H_
@@ -188,14 +188,7 @@ private:
 	void _startAcq();
     inline bool IS_POWER_OF_2(long x)
     {
-        if( ((x ^ (x - 1)) == x + (x - 1)) && (x != 0) )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (x > 0) && ((x & (x - 1)) == 0);
     }
     //////////////////////////////
     // -- dhyana specific members

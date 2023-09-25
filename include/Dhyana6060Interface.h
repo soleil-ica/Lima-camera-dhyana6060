@@ -22,7 +22,7 @@
 //
 // DhyanaInterface.h
 // Created on: August 09, 2023
-// Author: Arafat NOUREDDINE
+// Author: Marc DESGRANGES
 
 #ifndef DHYANA6060INTERFACE_H_
 #define DHYANA6060INTERFACE_H_
