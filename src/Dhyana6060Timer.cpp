@@ -68,6 +68,22 @@ CBaseTimer::~CBaseTimer()
 };
 
 //---------------------------
+// @brief  set_oneshot
+//--------------------------- 
+void CBaseTimer::enable_oneshot_mode()
+{
+	m_is_oneshot = true;
+}
+
+//---------------------------
+// @brief  set_oneshot
+//--------------------------- 
+void CBaseTimer::disable_oneshot_mode()
+{
+	m_is_oneshot = false;
+}
+
+//---------------------------
 // @brief  start
 //---------------------------   
 void CBaseTimer::start()

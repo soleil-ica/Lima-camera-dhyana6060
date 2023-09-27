@@ -48,9 +48,9 @@ class Camera;
  * \brief Dhyana hardware interface
  *******************************************************************/
 
-class LIBDHYANA_API Interface : public HwInterface
+class LIBDHYANA6060_API Interface : public HwInterface
 {
-    DEB_CLASS_NAMESPC(DebModCamera, "Interface", "Dhyana");
+    DEB_CLASS_NAMESPC(DebModCamera, "Interface", "Dhyana6060");
 
 public:
     Interface(Camera& cam);

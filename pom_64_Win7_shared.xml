@@ -52,7 +52,7 @@
                             <option>-w</option>
                         </options>				
                         <defines>
-							<define>LIBDHYANA_EXPORTS</define>
+							<define>LIBDHYANA6060_EXPORTS</define>
                             <define>WIN32</define>
                             <define>NDEBUG</define>
                             <define>_WINDOWS</define>

@@ -53,9 +53,9 @@ class CSoftTriggerTimer;
  * \class Camera
  * \brief object controlling the Dhyana camera
  *******************************************************************/
-class LIBDHYANA_API Camera
+class LIBDHYANA6060_API Camera
 {
-    DEB_CLASS_NAMESPC(DebModCamera, "Camera", "Dhyana");
+    DEB_CLASS_NAMESPC(DebModCamera, "Camera", "Dhyana6060");
 
 public:
 
@@ -149,7 +149,7 @@ public:
     void getRoi(Roi& hw_roi);
 
     ///////////////////////////////
-    // -- dhyana specific functions
+    // -- dhyana6060 specific functions
     ///////////////////////////////
 
     void getCameraTemperature(double& temp);
@@ -185,13 +185,13 @@ private:
  //read/copy frame
     bool readFrame(void *bptr, int& frame_nb);
     void setStatus(Camera::Status status, bool force);    
-	void _startAcq();
+	  void _startAcq();
     inline bool IS_POWER_OF_2(long x)
     {
         return (x > 0) && ((x & (x - 1)) == 0);
     }
     //////////////////////////////
-    // -- dhyana specific members
+    // -- dhyana6060 specific members
     //////////////////////////////
 
     class AcqThread;

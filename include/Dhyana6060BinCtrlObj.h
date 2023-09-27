@@ -42,9 +42,9 @@ class Camera;
  * \class BinCtrlObj
  * \brief Control object providing Basler Bin interface
  *******************************************************************/
-class LIBDHYANA_API BinCtrlObj : public HwBinCtrlObj
+class LIBDHYANA6060_API BinCtrlObj : public HwBinCtrlObj
 {
-    DEB_CLASS_NAMESPC(DebModCamera, "BinCtrlObj", "Dhyana");
+    DEB_CLASS_NAMESPC(DebModCamera, "BinCtrlObj", "Dhyana6060");
 public:
     BinCtrlObj(Camera& cam);
     virtual ~BinCtrlObj();
