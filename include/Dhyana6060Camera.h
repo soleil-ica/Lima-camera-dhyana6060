@@ -165,7 +165,6 @@ public:
     void setGlobalGain(unsigned gain);
     void getGlobalGain(unsigned& gain);
     void getTucamVersion(std::string& version);
-    void getFirmwareVersion(std::string& version);
     bool isAcqRunning() const;
 
     void getFPS(double& fps);	
@@ -173,8 +172,23 @@ public:
     void setTriggerMode(TucamTriggerMode mode);
     void getTriggerEdge(TucamTriggerEdge& edge);
     void setTriggerEdge(TucamTriggerEdge edge);
-    void getOutputSignal(int port, TucamSignal& signal, TucamSignalEdge& edge, int& delay, int& width);
-    void setOutputSignal(int port, TucamSignal signal, TucamSignalEdge edge=kSignalEdgeRising, int delay=-1, int width=-1);
+    void setTrigInEdge(unsigned edge);
+    void getTrigInEdge(unsigned& edge);
+    void setTrigInExpType(unsigned type);
+    void getTrigInExpType(unsigned& type);
+    void setTrigInDelay(double delay);
+    void getTrigInDelay(double& delay);
+    void setTrigOutputPort(unsigned port);
+    void getTrigOutputPort(unsigned& port);
+    void setTrigOutputKind(unsigned kind);
+    void getTrigOutputKind(unsigned& kind);
+    void setTrigOutputWidth(double width);
+    void getTrigOutputWidth(double& width);
+    void setTrigOutputDelay(double delay);
+    void getTrigOutputDelay(double& delay);
+    void setTrigOutputEdge(unsigned edge);
+    void getTrigOutputEdge(unsigned& edge);
+
 
     //TUCAM stuff, use TUCAM notations !
     TUCAM_INIT          m_itApi; // TUCAM handle Api

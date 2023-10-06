@@ -126,12 +126,8 @@ void Camera::init()
 	m_hThdEvent = NULL;
 
 	TUCAM_ELEMENT node; // Property node
-	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "DeviceVendorName");
-	if(TUCAMRET_SUCCESS != err)
-	{
-		THROW_HW_ERROR(Error) << "Unable to Read SensorTemperature from the camera ! Error: " << err << " ";
-	}
-	err = TUCAM_GenICam_ElementAttrNext(m_opCam.hIdxTUCam, &node, node.pName);
+	node.pName = "Root";
+	int err = TUCAM_GenICam_ElementAttrNext(m_opCam.hIdxTUCam, &node, node.pName);
 	while(TUCAMRET_SUCCESS == err)
 	{
 		if (NULL == node.pName)
@@ -617,7 +613,7 @@ void Camera::getDetectorModel(std::string& model)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read DeviceModelName from the camera ! Error: " << err << " ";
 	}
-	model = node.dbVal;
+	model = node.pTransfer;
 }
 
 //-----------------------------------------------------
@@ -654,7 +650,6 @@ void Camera::getPixelSize(double& sizex, double& sizey)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read SensorPixelSize from the camera ! Error: " << err << " ";
 	}
-	DEB_TRACE() << node.nVal;
 	sizex = node.nVal;
 	sizey = node.nVal;
 }
@@ -1325,16 +1320,13 @@ void Camera::getGlobalGain(unsigned& gain)
 void Camera::getTucamVersion(std::string& version)
 {
 	DEB_MEMBER_FUNCT();
-	//TODO
-}
-
-//-----------------------------------------------------
-//
-//-----------------------------------------------------  
-void Camera::getFirmwareVersion(std::string& version)
-{
-	DEB_MEMBER_FUNCT();
-	//TODO
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "DeviceVersion");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read DeviceVersion from the camera ! Error: " << err << " ";
+	}
+	version = node.pTransfer;
 }
 
 //-----------------------------------------------------------------------------
@@ -1347,19 +1339,265 @@ void Camera::getFPS(double& fps) ///< [out] last computed fps
 }
 
 //-----------------------------------------------------
-// Set trigger outpout on selected port
+//
 //-----------------------------------------------------  
-void Camera::setOutputSignal(int port, TucamSignal signal, TucamSignalEdge edge, int delay, int width)
+void Camera::setTrigInEdge(unsigned edge)
 {
 	DEB_MEMBER_FUNCT();
-	//TODO
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.nVal = edge;
+	node.pName = "TrigEdge";
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to set TrigInEdge target from the camera ! Error: " << err << " ";
+	}
 }
 
 //-----------------------------------------------------
-// Get trigger outpout on selected port
-//----------------------------------------------------- 
-void Camera::getOutputSignal(int port, TucamSignal& signal, TucamSignalEdge& edge, int& delay, int& width)
+//
+//-----------------------------------------------------  
+void Camera::getTrigInEdge(unsigned& edge)
 {
-  DEB_MEMBER_FUNCT();
-  //TODO
+	DEB_MEMBER_FUNCT();
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "TrigEdge");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read TrigInEdge from the camera ! Error: " << err << " ";
+	}
+	edge = node.nVal;
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::setTrigInExpType(unsigned type)
+{
+	DEB_MEMBER_FUNCT();
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.nVal = type;
+	node.pName = "TrigExpType";
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to set TrigInExpType target from the camera ! Error: " << err << " ";
+	}
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::getTrigInExpType(unsigned& type)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "TrigExpType");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read TrigInExpType from the camera ! Error: " << err << " ";
+	}
+	type = node.nVal;
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::setTrigInDelay(double delay)
+{
+	DEB_MEMBER_FUNCT();
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.dbVal = delay;
+	node.pName = "TrigDelay";
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to set TrigInDelay target from the camera ! Error: " << err << " ";
+	}
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::getTrigInDelay(double& delay)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "TrigDelay");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read TrigInDelay from the camera ! Error: " << err << " ";
+	}
+	delay = node.dbVal;
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::setTrigOutputPort(unsigned port)
+{
+	DEB_MEMBER_FUNCT();
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.nVal = port;
+	node.pName = "TrigOutputPort";
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to set TrigOutputPort target from the camera ! Error: " << err << " ";
+	}
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::getTrigOutputPort(unsigned& port)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "TrigOutputPort");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read TrigOutputPort from the camera ! Error: " << err << " ";
+	}
+	port = node.nVal;
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::setTrigOutputKind(unsigned kind)
+{
+	DEB_MEMBER_FUNCT();
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.nVal = kind;
+	node.pName = "TrigOutputKind";
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to set TrigOutputKind target from the camera ! Error: " << err << " ";
+	}
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::getTrigOutputKind(unsigned& kind)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "TrigOutputKind");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read TrigOutputKind from the camera ! Error: " << err << " ";
+	}
+	kind = node.nVal;
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::setTrigOutputWidth(double width)
+{
+	DEB_MEMBER_FUNCT();
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.nVal = width;
+	node.pName = "TrigOutputWidth";
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to set TrigOutputWidth target from the camera ! Error: " << err << " ";
+	}
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::getTrigOutputWidth(double& width)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "TrigOutputWidth");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read TrigOutputWidth from the camera ! Error: " << err << " ";
+	}
+	width = node.nVal;
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::setTrigOutputDelay(double delay)
+{
+	DEB_MEMBER_FUNCT();
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.dbVal = delay;
+	node.pName = "TrigOutputDelay";
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to set TrigOutputDelay target from the camera ! Error: " << err << " ";
+	}
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::getTrigOutputDelay(double& delay)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "TrigOutputDelay");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read TrigOutputDelay from the camera ! Error: " << err << " ";
+	}
+	delay = node.dbVal;
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::setTrigOutputEdge(unsigned edge)
+{
+	DEB_MEMBER_FUNCT();
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.nVal = edge;
+	node.pName = "TrigOutputEdge";
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to set TrigOutputEdge target from the camera ! Error: " << err << " ";
+	}
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::getTrigOutputEdge(unsigned& edge)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "TrigOutputEdge");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read TrigOutputEdge from the camera ! Error: " << err << " ";
+	}
+	edge = node.nVal;
 }

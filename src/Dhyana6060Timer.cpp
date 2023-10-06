@@ -45,7 +45,7 @@ CBaseTimer::CBaseTimer(int period) :
 m_period_ms(period),
 m_nb_triggers(-1)
 {
-	DEB_CONSTRUCTOR();		
+	DEB_CONSTRUCTOR();	
 	// Set resolution to the minimum supported by the system
     TIMECAPS tc;
     if(timeGetDevCaps(&tc, sizeof(TIMECAPS))!=TIMERR_NOERROR)
@@ -89,16 +89,12 @@ void CBaseTimer::disable_oneshot_mode()
 void CBaseTimer::start()
 {
 	DEB_MEMBER_FUNCT();
-	////Timestamp t0 = Timestamp::now();		
 	m_nb_triggers = -1;
 	m_timer_id = timeSetEvent(m_period_ms, m_resolution, base_timer_proc, (DWORD_PTR)this, TIME_PERIODIC);
 	if (m_timer_id == NULL)
 	{
 		throw std::exception("Erreur timeSetEvent");
 	}
-	////Timestamp t1 = Timestamp::now();
-	////double delta_time = t1 - t0;
-	////DEB_TRACE() << "timeSetEvent : elapsed time = " << (int) (delta_time * 1000) << " (ms)";		
 }
 
 //---------------------------
@@ -140,21 +136,16 @@ CSoftTriggerTimer::~CSoftTriggerTimer()
 void CSoftTriggerTimer::on_timer()
 {
 	DEB_MEMBER_FUNCT();
-	//Generate software trigger for each frame, except for the first image
-	//if((!m_cam.m_nb_frames || m_cam.m_acq_frame_nb < m_cam.m_nb_frames) && (m_cam.m_trigger_mode == IntTrig))
-	{
-		//if(m_cam.getNbHwAcquiredFrames() > m_nb_triggers)
-		{
-			Timestamp t0 = Timestamp::now();						
-			m_nb_triggers++;
-			////DEB_TRACE() << "CSoftTriggerTimer::on_timer : DoSoftwareTrigger - "<<m_nb_triggers;
-			TUCAM_Cap_DoSoftwareTrigger(m_cam.m_opCam.hIdxTUCam);	
-			stop();
-			Timestamp t1 = Timestamp::now();
-			double delta_time = t1 - t0;
-			DEB_TRACE() << "DoSoftwareTrigger : elapsed time = " << (int) (delta_time * 1000) << " (ms)";					
-		}
-	}
+	DEB_TRACE() << "CSoftTriggerTimer::on_timer : DoSoftwareTrigger";
+	//TUCAM_Cap_DoSoftwareTrigger(m_cam.m_opCam.hIdxTUCam);
+	//do Software command
+	TUCAM_ELEMENT node;
+	node.pName = "TrigSoftwareSignal";
+	TUCAM_GenICam_ElementAttr(m_cam.m_opCam.hIdxTUCam, &node, node.pName);
+	node.nVal = 0;
+	TUCAM_GenICam_SetElementValue(m_cam.m_opCam.hIdxTUCam, &node);
+	if(m_is_oneshot)//for internal_multi
+		stop();
 
 	//This Timer is oneshot, stop() it 
 	//stop();
