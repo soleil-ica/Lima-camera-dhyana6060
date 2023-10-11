@@ -1603,3 +1603,35 @@ void Camera::getTrigOutputEdge(unsigned& edge)
 	}
 	edge = node.nVal;
 }
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::setSensorCooling(unsigned type)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.nVal = type;
+	node.pName = "SensorCooling";
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to set SensorCooling to the camera ! Error: " << err << " ";
+	}
+}
+
+//-----------------------------------------------------
+//
+//-----------------------------------------------------  
+void Camera::getSensorCooling(unsigned& type)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "SensorCooling");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read SensorCooling from the camera ! Error: " << err << " ";
+	}
+	type = node.nVal;
+}

@@ -191,6 +191,8 @@ public:
     void setTrigOutputEdge(unsigned edge);
     void getTrigOutputEdge(unsigned& edge);
 
+    void setSensorCooling(unsigned type);
+    void getSensorCooling(unsigned& type);
 
     //TUCAM stuff, use TUCAM notations !
     TUCAM_INIT          m_itApi; // TUCAM handle Api
