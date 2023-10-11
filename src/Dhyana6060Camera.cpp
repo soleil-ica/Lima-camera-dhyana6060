@@ -790,13 +790,15 @@ void Camera::setTriggerEdge(TucamTriggerEdge edge)
 void Camera::getExpTime(double& exp_time)
 {
 	DEB_MEMBER_FUNCT();
+	DEB_TRACE() << "MDE - exp time before";
 	TUCAM_ELEMENT node; // Property node
 	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "AcquisitionExpTime");
 	if(TUCAMRET_SUCCESS != err)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read AcquisitionExpTime from the camera ! Error: " << err << " ";
 	}
-	exp_time = node.nVal;
+	exp_time = node.nVal / 1000000; //TUCAM use (us), but lima use (second) as unit
+	DEB_TRACE() << "MDE - exp time: " << exp_time;
 }
 
 //-----------------------------------------------------
@@ -807,7 +809,7 @@ void Camera::setExpTime(double exp_time)
 	DEB_MEMBER_FUNCT();
 	TUCAMRET err;
 	TUCAM_ELEMENT node; // Property node
-	node.nVal = exp_time;
+	node.nVal = exp_time * 1000000; //TUCAM use (us), but lima use (second) as unit 
 	node.pName = "AcquisitionExpTime";
 	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 	if(TUCAMRET_SUCCESS != err)
@@ -988,7 +990,7 @@ void Camera::getRoi(Roi& hw_roi)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read ROIWidth from the camera ! Error: " << err << " ";
 	}
-	double width = node.dbVal;
+	double width = node.nVal;
 
 	// Get ROI Height
 	err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "Height");
@@ -996,7 +998,7 @@ void Camera::getRoi(Roi& hw_roi)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read ROIHeight from the camera ! Error: " << err << " ";
 	}
-	double height = node.dbVal;
+	double height = node.nVal;
 
 	// Get ROI Offset x
 	err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "OffsetX");
@@ -1004,7 +1006,7 @@ void Camera::getRoi(Roi& hw_roi)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read ROIOffsetX from the camera ! Error: " << err << " ";
 	}
-	double x_offset = node.dbVal;
+	double x_offset = node.nVal;
 
 	// Get ROI Offset y
 	err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "OffsetY");
@@ -1012,13 +1014,13 @@ void Camera::getRoi(Roi& hw_roi)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read ROIOffsetY from the camera ! Error: " << err << " ";
 	}
-	double y_offset = node.dbVal;
+	double y_offset = node.nVal;
 	hw_roi = Roi(x_offset,
 				y_offset,
 				width,
 				height);
 	//@END
-
+	DEB_TRACE() << "MDE - ROI : " << x_offset << ", " << y_offset << ", " << width << ", " << height;
 	DEB_RETURN() << DEB_VAR1(hw_roi);
 }
 
@@ -1413,7 +1415,7 @@ void Camera::setTrigInDelay(double delay)
 
 	TUCAMRET err;
 	TUCAM_ELEMENT node; // Property node
-	node.dbVal = delay;
+	node.nVal = delay;
 	node.pName = "TrigDelay";
 	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 	if(TUCAMRET_SUCCESS != err)
@@ -1434,7 +1436,7 @@ void Camera::getTrigInDelay(double& delay)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read TrigInDelay from the camera ! Error: " << err << " ";
 	}
-	delay = node.dbVal;
+	delay = node.nVal;
 }
 
 //-----------------------------------------------------
@@ -1545,7 +1547,7 @@ void Camera::setTrigOutputDelay(double delay)
 
 	TUCAMRET err;
 	TUCAM_ELEMENT node; // Property node
-	node.dbVal = delay;
+	node.nVal = delay;
 	node.pName = "TrigOutputDelay";
 	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 	if(TUCAMRET_SUCCESS != err)
@@ -1566,7 +1568,7 @@ void Camera::getTrigOutputDelay(double& delay)
 	{
 		THROW_HW_ERROR(Error) << "Unable to Read TrigOutputDelay from the camera ! Error: " << err << " ";
 	}
-	delay = node.dbVal;
+	delay = node.nVal;
 }
 
 //-----------------------------------------------------

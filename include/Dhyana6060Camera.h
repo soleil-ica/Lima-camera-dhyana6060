@@ -45,6 +45,8 @@ namespace lima
 namespace Dhyana6060
 {
 
+const int PIXEL_SIZE_WIDTH_MICRON  = 10; // pixel size is 10 micron
+const int PIXEL_SIZE_HEIGHT_MICRON = 10; // pixel size is 10 micron
 
 class BufferCtrlObj;
 class CSoftTriggerTimer;

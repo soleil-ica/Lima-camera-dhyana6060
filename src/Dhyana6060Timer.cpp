@@ -136,7 +136,7 @@ CSoftTriggerTimer::~CSoftTriggerTimer()
 void CSoftTriggerTimer::on_timer()
 {
 	DEB_MEMBER_FUNCT();
-	DEB_TRACE() << "CSoftTriggerTimer::on_timer : DoSoftwareTrigger";
+	//DEB_TRACE() << "CSoftTriggerTimer::on_timer : DoSoftwareTrigger";
 	//TUCAM_Cap_DoSoftwareTrigger(m_cam.m_opCam.hIdxTUCam);
 	//do Software command
 	TUCAM_ELEMENT node;
@@ -153,4 +153,4 @@ void CSoftTriggerTimer::on_timer()
 
 //-----------------------------------------------------
 //
-//-----------------------------------------------------  
+//-----------------------------------------------------
