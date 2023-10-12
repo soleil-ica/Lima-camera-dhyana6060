@@ -89,7 +89,6 @@ namespace Dhyana6060
 		int  m_timer_id;
 		long m_period_ms;
 		UINT m_resolution;
-		int  m_nb_triggers;
 		bool m_is_oneshot;
 	};
 

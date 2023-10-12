@@ -453,6 +453,22 @@ void Camera::AcqThread::threadFunction()
 			
 			if(TUCAMRET_SUCCESS == TUCAM_Buf_WaitForFrame(m_cam.m_opCam.hIdxTUCam, &m_cam.m_frame))
 			{
+				//The based information
+				DEB_TRACE() << "m_cam.m_frame.szSignature = "	<< m_cam.m_frame.szSignature;		// [out]Copyright+Version: TU+1.0 ['T', 'U', '1', '\0']		
+				DEB_TRACE() << "m_cam.m_frame.usHeader = "	<< m_cam.m_frame.usHeader;			// [out] The frame header size
+				DEB_TRACE() << "m_cam.m_frame.usOffset = "	<< m_cam.m_frame.usOffset;			// [out] The frame data offset
+				DEB_TRACE() << "m_cam.m_frame.usWidth = "		<< m_cam.m_frame.usWidth;						// [out] The frame width
+				DEB_TRACE() << "m_cam.m_frame.usHeight = "	<< m_cam.m_frame.usHeight;						// [out] The frame height
+				DEB_TRACE() << "m_cam.m_frame.uiWidthStep = "	<< m_cam.m_frame.uiWidthStep;		// [out] The frame width step
+				DEB_TRACE() << "m_cam.m_frame.ucDepth = "		<< m_cam.m_frame.ucDepth;			// [out] The frame data depth 
+				DEB_TRACE() << "m_cam.m_frame.ucFormat = "	<< m_cam.m_frame.ucFormat;			// [out] The frame data format                  
+				DEB_TRACE() << "m_cam.m_frame.ucChannels = "	<< m_cam.m_frame.ucChannels;			// [out] The frame data channels
+				DEB_TRACE() << "m_cam.m_frame.ucElemBytes = "	<< m_cam.m_frame.ucElemBytes;		// [out] The frame data bytes per element
+				DEB_TRACE() << "m_cam.m_frame.ucFormatGet = "	<< m_cam.m_frame.ucFormatGet;		// [in]  Which frame data format do you want    see TUFRM_FORMATS
+				DEB_TRACE() << "m_cam.m_frame.uiIndex = "		<< m_cam.m_frame.uiIndex;						// [in/out] The frame index number
+				DEB_TRACE() << "m_cam.m_frame.uiImgSize = "	<< m_cam.m_frame.uiImgSize;						// [out] The frame size
+				DEB_TRACE() << "m_cam.m_frame.uiRsdSize = "	<< m_cam.m_frame.uiRsdSize;						// [in]  The frame reserved size    (how many frames do you want)
+
 				// Grabbing was successful, process image
 				m_cam.setStatus(Camera::Readout, false);
 
@@ -697,38 +713,64 @@ void Camera::setTrigMode(TrigMode mode)
 	DEB_TRACE() << "setTrigMode() " << DEB_VAR1(mode);
 	DEB_PARAM() << DEB_VAR1(mode);
 	//@BEGIN
-	TUCAM_TRIGGER_ATTR tgrAttr;
-	tgrAttr.nTgrMode = -1;//NOT DEFINED (see below)
-	tgrAttr.nFrames = 1;
-	tgrAttr.nDelayTm = 0;
-	tgrAttr.nExpMode = -1;//NOT DEFINED (see below)
-	tgrAttr.nEdgeMode = TUCTD_RISING;
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	node.pName = "AcquisitionTrigMode";
 
 	switch(mode)
 	{
 		case IntTrig:
-			tgrAttr.nTgrMode = TUCCM_TRIGGER_SOFTWARE;
-			tgrAttr.nExpMode = TUCTE_EXPTM;
-			TUCAM_Cap_SetTrigger(m_opCam.hIdxTUCam, tgrAttr);
+			node.nVal = 2;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
+			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+
+			node.pName = "TrigExpType";
+			node.nVal = TUCTE_EXPTM;
+			err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+			if(TUCAMRET_SUCCESS != err)
+			{
+				THROW_HW_ERROR(Error) << "Unable to set TrigInExpType target from the camera ! Error: " << err << " ";
+			}
 			DEB_TRACE() << "TUCAM_Cap_SetTrigger : TUCCM_TRIGGER_SOFTWARE (EXPOSURE SOFTWARE)";
 			break;
 		case IntTrigMult:
-			tgrAttr.nTgrMode = TUCCM_TRIGGER_SOFTWARE;
-			tgrAttr.nExpMode = TUCTE_EXPTM;
-			TUCAM_Cap_SetTrigger(m_opCam.hIdxTUCam, tgrAttr);
+			node.nVal = 2;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
+			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+
+			node.pName = "TrigExpType";
+			node.nVal = TUCTE_EXPTM;
+			err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+			if(TUCAMRET_SUCCESS != err)
+			{
+				THROW_HW_ERROR(Error) << "Unable to set TrigInExpType target from the camera ! Error: " << err << " ";
+			}
 			DEB_TRACE() << "TUCAM_Cap_SetTrigger : TUCCM_TRIGGER_SOFTWARE (EXPOSURE SOFTWARE) (MULTI)";
 			break;			
 		case ExtTrigMult :
-			tgrAttr.nTgrMode = TUCCM_TRIGGER_STANDARD;
-			tgrAttr.nExpMode = TUCTE_EXPTM;
-			TUCAM_Cap_SetTrigger(m_opCam.hIdxTUCam, tgrAttr);
-			DEB_TRACE() << "TUCAM_Cap_SetTrigger : TUCCM_TRIGGER_STANDARD (EXPOSURE SOFTWARE: "<<tgrAttr.nExpMode<<")";
+			node.nVal = 1;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
+			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+
+			node.pName = "TrigExpType";
+			node.nVal = TUCTE_EXPTM;
+			err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+			if(TUCAMRET_SUCCESS != err)
+			{
+				THROW_HW_ERROR(Error) << "Unable to set TrigInExpType target from the camera ! Error: " << err << " ";
+			}
+			DEB_TRACE() << "TUCAM_Cap_SetTrigger : TUCCM_TRIGGER_STANDARD (EXPOSURE SOFTWARE: TrigTimed)";
 			break;
 		case ExtGate:
-			tgrAttr.nTgrMode = TUCCM_TRIGGER_STANDARD;
-			tgrAttr.nExpMode = TUCTE_WIDTH;
-			TUCAM_Cap_SetTrigger(m_opCam.hIdxTUCam, tgrAttr);
-			DEB_TRACE() << "TUCAM_Cap_SetTrigger : TUCCM_TRIGGER_STANDARD (EXPOSURE TRIGGER WIDTH: "<<tgrAttr.nExpMode<<")";
+			node.nVal = 1;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
+			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+
+			node.pName = "TrigExpType";
+			node.nVal = TUCTE_WIDTH;
+			err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+			if(TUCAMRET_SUCCESS != err)
+			{
+				THROW_HW_ERROR(Error) << "Unable to set TrigInExpType target from the camera ! Error: " << err << " ";
+			}
+			DEB_TRACE() << "TUCAM_GenICam_SetElementValue : TUCCM_TRIGGER_STANDARD (EXPOSURE TRIGGER WIDTH: TrigWidth)";
 			break;			
 		case ExtTrigSingle :
 		case ExtTrigReadout:
