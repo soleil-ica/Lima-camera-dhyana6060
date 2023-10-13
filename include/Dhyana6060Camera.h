@@ -45,6 +45,8 @@ namespace lima
 namespace Dhyana6060
 {
 
+const int PIXEL_SIZE_WIDTH_MICRON  = 10; // pixel size is 10 micron
+const int PIXEL_SIZE_HEIGHT_MICRON = 10; // pixel size is 10 micron
 
 class BufferCtrlObj;
 class CSoftTriggerTimer;
@@ -53,9 +55,9 @@ class CSoftTriggerTimer;
  * \class Camera
  * \brief object controlling the Dhyana camera
  *******************************************************************/
-class LIBDHYANA_API Camera
+class LIBDHYANA6060_API Camera
 {
-    DEB_CLASS_NAMESPC(DebModCamera, "Camera", "Dhyana");
+    DEB_CLASS_NAMESPC(DebModCamera, "Camera", "Dhyana6060");
 
 public:
 
@@ -149,7 +151,7 @@ public:
     void getRoi(Roi& hw_roi);
 
     ///////////////////////////////
-    // -- dhyana specific functions
+    // -- dhyana6060 specific functions
     ///////////////////////////////
 
     void getCameraTemperature(double& temp);
@@ -165,7 +167,6 @@ public:
     void setGlobalGain(unsigned gain);
     void getGlobalGain(unsigned& gain);
     void getTucamVersion(std::string& version);
-    void getFirmwareVersion(std::string& version);
     bool isAcqRunning() const;
 
     void getFPS(double& fps);	
@@ -173,8 +174,25 @@ public:
     void setTriggerMode(TucamTriggerMode mode);
     void getTriggerEdge(TucamTriggerEdge& edge);
     void setTriggerEdge(TucamTriggerEdge edge);
-    void getOutputSignal(int port, TucamSignal& signal, TucamSignalEdge& edge, int& delay, int& width);
-    void setOutputSignal(int port, TucamSignal signal, TucamSignalEdge edge=kSignalEdgeRising, int delay=-1, int width=-1);
+    void setTrigInEdge(unsigned edge);
+    void getTrigInEdge(unsigned& edge);
+    void setTrigInExpType(unsigned type);
+    void getTrigInExpType(unsigned& type);
+    void setTrigInDelay(double delay);
+    void getTrigInDelay(double& delay);
+    void setTrigOutputPort(unsigned port);
+    void getTrigOutputPort(unsigned& port);
+    void setTrigOutputKind(unsigned kind);
+    void getTrigOutputKind(unsigned& kind);
+    void setTrigOutputWidth(double width);
+    void getTrigOutputWidth(double& width);
+    void setTrigOutputDelay(double delay);
+    void getTrigOutputDelay(double& delay);
+    void setTrigOutputEdge(unsigned edge);
+    void getTrigOutputEdge(unsigned& edge);
+
+    void setSensorCooling(unsigned type);
+    void getSensorCooling(unsigned& type);
 
     //TUCAM stuff, use TUCAM notations !
     TUCAM_INIT          m_itApi; // TUCAM handle Api
@@ -185,13 +203,13 @@ private:
  //read/copy frame
     bool readFrame(void *bptr, int& frame_nb);
     void setStatus(Camera::Status status, bool force);    
-	void _startAcq();
+	  void _startAcq();
     inline bool IS_POWER_OF_2(long x)
     {
         return (x > 0) && ((x & (x - 1)) == 0);
     }
     //////////////////////////////
-    // -- dhyana specific members
+    // -- dhyana6060 specific members
     //////////////////////////////
 
     class AcqThread;

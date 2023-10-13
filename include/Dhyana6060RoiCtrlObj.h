@@ -43,9 +43,9 @@ class Camera;
  * \brief Control object providing Basler Roi interface
  *******************************************************************/
 
-class LIBDHYANA_API RoiCtrlObj : public HwRoiCtrlObj
+class LIBDHYANA6060_API RoiCtrlObj : public HwRoiCtrlObj
 {
-    DEB_CLASS_NAMESPC(DebModCamera, "RoiCtrlObj", "Dhyana");
+    DEB_CLASS_NAMESPC(DebModCamera, "RoiCtrlObj", "Dhyana6060");
 
 public:
     RoiCtrlObj(Camera& cam);

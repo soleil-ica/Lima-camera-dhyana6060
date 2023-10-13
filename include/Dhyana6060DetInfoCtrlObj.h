@@ -41,8 +41,8 @@ class Camera;
  * \brief Control object providing Dhyana detector info interface
  *******************************************************************/
 
-class LIBDHYANA_API DetInfoCtrlObj: public HwDetInfoCtrlObj {
-	DEB_CLASS_NAMESPC(DebModCamera, "DetInfoCtrlObj", "Dhyana");
+class LIBDHYANA6060_API DetInfoCtrlObj: public HwDetInfoCtrlObj {
+	DEB_CLASS_NAMESPC(DebModCamera, "DetInfoCtrlObj", "Dhyana6060");
 
 public:
 	DetInfoCtrlObj(Camera& cam);

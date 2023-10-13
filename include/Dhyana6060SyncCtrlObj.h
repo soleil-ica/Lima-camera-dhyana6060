@@ -43,9 +43,9 @@ namespace lima
      * \brief Control object providing Dhyana synchronization interface
      *******************************************************************/
 
-    class LIBDHYANA_API SyncCtrlObj: public HwSyncCtrlObj
+    class LIBDHYANA6060_API SyncCtrlObj: public HwSyncCtrlObj
     {
-    DEB_CLASS_NAMESPC(DebModCamera, "SyncCtrlObj", "Dhyana");
+    DEB_CLASS_NAMESPC(DebModCamera, "SyncCtrlObj", "Dhyana6060");
 
     public:
     	SyncCtrlObj(Camera& cam);
