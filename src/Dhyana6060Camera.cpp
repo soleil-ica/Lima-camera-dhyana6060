@@ -717,12 +717,12 @@ void Camera::setTrigMode(TrigMode mode)
 	TUCAMRET err;
 	TUCAM_ELEMENT node; // Property node
 	node.pName = "AcquisitionTrigMode";
+	node.nVal = 1;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
+	TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 
 	switch(mode)
 	{
 		case IntTrig:
-			node.nVal = 2;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
-			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 
 			node.pName = "TrigExpType";
 			node.nVal = TUCTE_EXPTM;
@@ -731,12 +731,13 @@ void Camera::setTrigMode(TrigMode mode)
 			{
 				THROW_HW_ERROR(Error) << "Unable to set TrigInExpType target from the camera ! Error: " << err << " ";
 			}
+
+			node.pName = "AcquisitionTrigMode";
+			node.nVal = 2;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
+			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 			DEB_TRACE() << "TUCAM_Cap_SetTrigger : TUCCM_TRIGGER_SOFTWARE (EXPOSURE SOFTWARE)";
 			break;
 		case IntTrigMult:
-			node.nVal = 2;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
-			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
-
 			node.pName = "TrigExpType";
 			node.nVal = TUCTE_EXPTM;
 			err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
@@ -744,11 +745,15 @@ void Camera::setTrigMode(TrigMode mode)
 			{
 				THROW_HW_ERROR(Error) << "Unable to set TrigInExpType target from the camera ! Error: " << err << " ";
 			}
+
+			node.pName = "AcquisitionTrigMode";
+			node.nVal = 2;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
+			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 			DEB_TRACE() << "TUCAM_Cap_SetTrigger : TUCCM_TRIGGER_SOFTWARE (EXPOSURE SOFTWARE) (MULTI)";
 			break;			
 		case ExtTrigMult :
-			node.nVal = 1;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
-			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+			//already in standard mode
+
 
 			node.pName = "TrigExpType";
 			node.nVal = TUCTE_EXPTM;
@@ -760,8 +765,7 @@ void Camera::setTrigMode(TrigMode mode)
 			DEB_TRACE() << "TUCAM_Cap_SetTrigger : TUCCM_TRIGGER_STANDARD (EXPOSURE SOFTWARE: TrigTimed)";
 			break;
 		case ExtGate:
-			node.nVal = 1;  //0-FreeRunning / 1-Standard / 2-Software / 3-GPS
-			TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+			//already in standard mode
 
 			node.pName = "TrigExpType";
 			node.nVal = TUCTE_WIDTH;
