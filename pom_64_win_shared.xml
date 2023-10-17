@@ -8,12 +8,12 @@
     </parent>
 
     <groupId>fr.soleil.lib.Lima.Camera</groupId>
-    <artifactId>LimaDhyana-${aol}-shared-${mode}</artifactId>
-    <version>1.5.0</version>
+    <artifactId>LimaDhyana6060-amd64-Windows-msvc12-shared-${mode}</artifactId>
+    <version>1.0.0</version>
 	
     <packaging>nar</packaging>
     <name>LimaDhyana6060</name>
-    <description>This module controls the TUcsen Dhyana Detector</description>
+    <description>This module controls the TUcsen Dhyana6060 Detector</description>
 
 	<properties>
 		<sdkdhyana-lib>${project.basedir}\sdk\msvc\lib\x64\</sdkdhyana-lib>
@@ -21,15 +21,15 @@
 	</properties>
     
     <scm>
-        <connection>scm:git:git://github.com/soleil-ica/Lima-camera-dhyana.git</connection>
-        <developerConnection>scm:git:git://github.com/soleil-ica/Lima-camera-dhyana.git</developerConnection>
-        <url>https://github.com/soleil-ica/Lima-camera-dhyana</url>
+        <connection>scm:git:git://github.com/soleil-ica/Lima-camera-dhyana6060.git</connection>
+        <developerConnection>scm:git:git://github.com/soleil-ica/Lima-camera-dhyana6060.git</developerConnection>
+        <url>https://github.com/soleil-ica/Lima-camera-dhyana6060</url>
     </scm>
 	
     <dependencies>
         <dependency>
             <groupId>fr.soleil.lib</groupId>
-            <artifactId>LimaCore-${aol}-shared-${mode}</artifactId>
+            <artifactId>LimaCore-amd64-Windows-msvc12-shared-${mode}</artifactId>
             <version>1.7.11</version>
         </dependency>
     </dependencies>
@@ -64,8 +64,8 @@
 					<linker>
                         <libs>
                             <lib>
-                                <!-- tucam -->
-                                <name>TUCam</name>
+                                <!-- tucam 6060 -->
+                                <name>TUCam6060</name>
                                 <type>shared</type>
                                 <directory>${sdkdhyana-lib}</directory>
                             </lib>
