@@ -125,19 +125,7 @@ void Camera::init()
 	//initialize TUCAM Event used when Waiting for Frame
 	m_hThdEvent = NULL;
 
-	TUCAM_ELEMENT node; // Property node
-	node.pName = "Root";
-	int err = TUCAM_GenICam_ElementAttrNext(m_opCam.hIdxTUCam, &node, node.pName);
-	while(TUCAMRET_SUCCESS == err)
-	{
-		if (NULL == node.pName)
-		{
-			continue;
-		}
-		
-		DEB_TRACE() << node.pName;
-		err = TUCAM_GenICam_ElementAttrNext(m_opCam.hIdxTUCam, &node, node.pName);
-	}
+	DEB_TRACE() << "Initialization ended ...";
 
 }
 
@@ -454,7 +442,7 @@ void Camera::AcqThread::threadFunction()
 			if(TUCAMRET_SUCCESS == TUCAM_Buf_WaitForFrame(m_cam.m_opCam.hIdxTUCam, &m_cam.m_frame))
 			{
 				//The based information
-				DEB_TRACE() << "m_cam.m_frame.szSignature = "	<< m_cam.m_frame.szSignature;		// [out]Copyright+Version: TU+1.0 ['T', 'U', '1', '\0']		
+				/*DEB_TRACE() << "m_cam.m_frame.szSignature = "	<< m_cam.m_frame.szSignature;		// [out]Copyright+Version: TU+1.0 ['T', 'U', '1', '\0']		
 				DEB_TRACE() << "m_cam.m_frame.usHeader = "	<< m_cam.m_frame.usHeader;			// [out] The frame header size
 				DEB_TRACE() << "m_cam.m_frame.usOffset = "	<< m_cam.m_frame.usOffset;			// [out] The frame data offset
 				DEB_TRACE() << "m_cam.m_frame.usWidth = "		<< m_cam.m_frame.usWidth;						// [out] The frame width
@@ -468,7 +456,8 @@ void Camera::AcqThread::threadFunction()
 				DEB_TRACE() << "m_cam.m_frame.uiIndex = "		<< m_cam.m_frame.uiIndex;						// [in/out] The frame index number
 				DEB_TRACE() << "m_cam.m_frame.uiImgSize = "	<< m_cam.m_frame.uiImgSize;						// [out] The frame size
 				DEB_TRACE() << "m_cam.m_frame.uiRsdSize = "	<< m_cam.m_frame.uiRsdSize;						// [in]  The frame reserved size    (how many frames do you want)
-
+				*/
+			
 				// Grabbing was successful, process image
 				m_cam.setStatus(Camera::Readout, false);
 
@@ -836,7 +825,6 @@ void Camera::setTriggerEdge(TucamTriggerEdge edge)
 void Camera::getExpTime(double& exp_time)
 {
 	DEB_MEMBER_FUNCT();
-	DEB_TRACE() << "MDE - exp time before";
 	TUCAM_ELEMENT node; // Property node
 	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "AcquisitionExpTime");
 	if(TUCAMRET_SUCCESS != err)
@@ -844,7 +832,6 @@ void Camera::getExpTime(double& exp_time)
 		THROW_HW_ERROR(Error) << "Unable to Read AcquisitionExpTime from the camera ! Error: " << err << " ";
 	}
 	exp_time = node.nVal / 1000000; //TUCAM use (us), but lima use (second) as unit
-	DEB_TRACE() << "MDE - exp time: " << exp_time;
 }
 
 //-----------------------------------------------------
@@ -1009,7 +996,15 @@ void Camera::checkRoi(const Roi& set_roi, Roi& hw_roi)
 	//@BEGIN : check available values of Roi
 	if(set_roi.isActive())
 	{
+		if ((set_roi.getSize().getWidth() % 16 != 0) || (set_roi.getSize().getWidth() < 64) ||
+			(set_roi.getSize().getHeight() % 4 != 0) || (set_roi.getSize().getHeight() < 64) ||
+			(set_roi.getTopLeft().x % 16 != 0) ||
+			(set_roi.getTopLeft().y % 4 != 0))
+		{
+			THROW_HW_ERROR(Error) << "Roi coordinates (x, y, width, height) must respect some constraints (cf. detector manual)";
+		}
 		hw_roi = set_roi;
+
 	}
 	else
 	{
@@ -1029,6 +1024,8 @@ void Camera::getRoi(Roi& hw_roi)
 	DEB_MEMBER_FUNCT();
 	//@BEGIN : get Roi from the Driver/API
 	TUCAM_ELEMENT node; // Property node
+	DEB_TRACE() << "MDE - enter getROI ";
+
 
 	// Get ROI Width
 	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "Width");
@@ -1065,8 +1062,9 @@ void Camera::getRoi(Roi& hw_roi)
 				y_offset,
 				width,
 				height);
-	//@END
 	DEB_TRACE() << "MDE - ROI : " << x_offset << ", " << y_offset << ", " << width << ", " << height;
+
+	//@END
 	DEB_RETURN() << DEB_VAR1(hw_roi);
 }
 
@@ -1152,6 +1150,8 @@ void Camera::setRoi(const Roi& set_roi)
 			THROW_HW_ERROR(Error) << "Unable to set ROIHeight from the camera ! Error: " << err << " ";
 		}
 	}
+	Roi hw_roi;
+	getRoi(hw_roi);
 }
 
 //-----------------------------------------------------
@@ -1680,4 +1680,150 @@ void Camera::getSensorCooling(unsigned& type)
 		THROW_HW_ERROR(Error) << "Unable to Read SensorCooling from the camera ! Error: " << err << " ";
 	}
 	type = node.nVal;
+}
+
+std::string Camera::getAllParameters()
+{
+	DEB_MEMBER_FUNCT();
+	std::stringstream res;
+	TUCAM_ELEMENT node; // Property node
+	node.pName = "Root";
+	int err = TUCAM_GenICam_ElementAttrNext(m_opCam.hIdxTUCam, &node, node.pName);
+	
+	while(TUCAMRET_SUCCESS == err)
+	{
+		if (NULL == node.pName)
+		{
+			continue;
+		}
+		switch (node.Type)
+		{
+		case TU_ElemCategory:
+			break;
+		case TU_ElemBoolean:
+			res << node.pName << " = " << node.nVal << std::endl;
+			break;
+		case TU_ElemInteger:
+			res << node.pName << " = " << node.nVal << std::endl;
+			break;
+		case TU_ElemFloat:
+			res << node.pName << " = " << node.dbVal << std::endl;
+			break;
+		case TU_ElemString:
+			res << node.pName << " = " << node.pTransfer << std::endl;
+			break;
+		case TU_ElemEnumeration:
+			res << node.pName << " = " << node.nVal << std::endl;
+			break;
+		case TU_ElemCommand:
+			res << node.pName << " = " << node.nVal << std::endl;
+			break;
+		case TU_ElemRegister:
+			res << node.pName << " = " << node.nVal << std::endl;
+			break;
+		
+		default:
+			res << "N/A" << std::endl;
+			break;
+		}
+		
+		err = TUCAM_GenICam_ElementAttrNext(m_opCam.hIdxTUCam, &node, node.pName);
+	}
+	return res.str();
+}
+
+std::string Camera::getParameter(std::string parameter)
+{
+	DEB_MEMBER_FUNCT();
+	std::stringstream res;
+	TUCAM_ELEMENT node; // Property node
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, const_cast<char*>(parameter.c_str()));
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "getParameter: Unable to get " << parameter << " from the camera ! Error: " << err << " ";
+	}
+	res << node.pName << " = ";
+	switch (node.Type)
+	{
+	case TU_ElemCategory:
+		/* code */
+		break;
+	case TU_ElemBoolean:
+		res << node.nVal << std::endl;
+		break;
+	case TU_ElemInteger:
+		res << node.nVal << std::endl;
+		break;
+	case TU_ElemFloat:
+		res << node.dbVal << std::endl;
+		break;
+	case TU_ElemString:
+		res << node.pTransfer << std::endl;
+		break;
+	case TU_ElemEnumeration:
+		res << node.nVal << std::endl;
+		break;
+	case TU_ElemCommand:
+		res << node.nVal << std::endl;
+		break;
+	case TU_ElemRegister:
+		/* code */
+		break;
+	
+	default:
+		res << "N/A" << std::endl;
+		break;
+	}
+	return res.str();
+}
+
+void Camera::setParameter(std::string parameter, double value)
+{
+	DEB_MEMBER_FUNCT();
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+	err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, const_cast<char*>(parameter.c_str()));
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Camera::setParameter: Unable to get " << parameter << " from the camera ! Error: " << err;
+	}
+	if (node.Access != 2 && node.Access != 4)
+	{
+		THROW_HW_ERROR(Error) << "Camera::setParameter: not writabale ! access type: " << node.Access;
+	}
+	node.nVal = value;
+	switch (node.Type)
+	{
+	case TU_ElemCategory:
+		/* code */
+		break;
+	case TU_ElemBoolean:
+		node.nVal = value;
+		break;
+	case TU_ElemInteger:
+		node.nVal = value;
+		break;
+	case TU_ElemFloat:
+		node.dbVal = value;
+		break;
+	case TU_ElemEnumeration:
+		node.nVal = value;
+		break;
+	case TU_ElemCommand:
+		node.nVal = value;
+		break;
+	case TU_ElemRegister:
+		/* code */
+		break;
+	
+	default:
+		THROW_HW_ERROR(Error) << "Camera::setParameter: not writabale !";
+		break;
+	}
+	err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Camera::setParameter: Unable to set " << parameter << " to the camera ! Error: " << err;
+	}
+
 }

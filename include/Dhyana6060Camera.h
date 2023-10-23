@@ -194,6 +194,11 @@ public:
     void setSensorCooling(unsigned type);
     void getSensorCooling(unsigned& type);
 
+    std::string getAllParameters();
+    std::string getParameter(std::string parameter);
+    void setParameter(std::string parameter, double value);
+
+
     //TUCAM stuff, use TUCAM notations !
     TUCAM_INIT          m_itApi; // TUCAM handle Api
     TUCAM_OPEN          m_opCam; // TUCAM handle camera
