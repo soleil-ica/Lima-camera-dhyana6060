@@ -996,8 +996,8 @@ void Camera::checkRoi(const Roi& set_roi, Roi& hw_roi)
 	//@BEGIN : check available values of Roi
 	if(set_roi.isActive())
 	{
-		if ((set_roi.getSize().getWidth() % 16 != 0) || (set_roi.getSize().getWidth() < 64) ||
-			(set_roi.getSize().getHeight() % 4 != 0) || (set_roi.getSize().getHeight() < 64) ||
+		if ((set_roi.getSize().getWidth() % 16 != 0) ||
+			(set_roi.getSize().getHeight() % 4 != 0) ||
 			(set_roi.getTopLeft().x % 16 != 0) ||
 			(set_roi.getTopLeft().y % 4 != 0))
 		{
@@ -1077,13 +1077,13 @@ void Camera::setRoi(const Roi& set_roi)
 	DEB_TRACE() << "setRoi";
 	DEB_PARAM() << DEB_VAR1(set_roi);
 	//@BEGIN : set Roi from the Driver/API	
+	//set Roi to Driver/API
+	Size size;
+	getDetectorImageSize(size);
 	if(!set_roi.isActive())
 	{
 		DEB_TRACE() << "Roi is not Enabled : so set full frame";
 
-		//set Roi to Driver/API
-		Size size;
-		getDetectorImageSize(size);
 
 		TUCAMRET err;
 		TUCAM_ELEMENT node; // Property node
@@ -1128,7 +1128,7 @@ void Camera::setRoi(const Roi& set_roi)
 		{
 			THROW_HW_ERROR(Error) << "Unable to set ROIOffsetX from the camera ! Error: " << err << " ";
 		}
-		node.nVal = set_roi.getTopLeft().y;
+		node.nVal = size.getHeight() - set_roi.getTopLeft().y - set_roi.getSize().getHeight();
 		node.pName = "OffsetY";
 		err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
 		if(TUCAMRET_SUCCESS != err)
@@ -1150,8 +1150,7 @@ void Camera::setRoi(const Roi& set_roi)
 			THROW_HW_ERROR(Error) << "Unable to set ROIHeight from the camera ! Error: " << err << " ";
 		}
 	}
-	Roi hw_roi;
-	getRoi(hw_roi);
+	//getRoi(set_roi);
 }
 
 //-----------------------------------------------------
