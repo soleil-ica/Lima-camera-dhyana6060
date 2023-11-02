@@ -1024,8 +1024,6 @@ void Camera::getRoi(Roi& hw_roi)
 	DEB_MEMBER_FUNCT();
 	//@BEGIN : get Roi from the Driver/API
 	TUCAM_ELEMENT node; // Property node
-	DEB_TRACE() << "MDE - enter getROI ";
-
 
 	// Get ROI Width
 	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "Width");
@@ -1062,8 +1060,6 @@ void Camera::getRoi(Roi& hw_roi)
 				y_offset,
 				width,
 				height);
-	DEB_TRACE() << "MDE - ROI : " << x_offset << ", " << y_offset << ", " << width << ", " << height;
-
 	//@END
 	DEB_RETURN() << DEB_VAR1(hw_roi);
 }
