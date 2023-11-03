@@ -1001,7 +1001,11 @@ void Camera::checkRoi(const Roi& set_roi, Roi& hw_roi)
 			(set_roi.getTopLeft().x % 16 != 0) ||
 			(set_roi.getTopLeft().y % 4 != 0))
 		{
-			THROW_HW_ERROR(Error) << "Roi coordinates (x, y, width, height) must respect some constraints (cf. detector manual)";
+			THROW_HW_ERROR(Error) << "Roi coordinates (x, y, width, height) must respect some constraints:\n"
+								  << " - x must be a multiple of 16\n"
+								  << " - y must be a multiple of 4\n"
+								  << " - width must be a multiple of 16\n"
+								  << " - height must be a multiple of 4\n";
 		}
 		hw_roi = set_roi;
 
@@ -1677,6 +1681,9 @@ void Camera::getSensorCooling(unsigned& type)
 	type = node.nVal;
 }
 
+//-----------------------------------------------------
+//
+//----------------------------------------------------- 
 std::string Camera::getAllParameters()
 {
 	DEB_MEMBER_FUNCT();
@@ -1727,6 +1734,9 @@ std::string Camera::getAllParameters()
 	return res.str();
 }
 
+//-----------------------------------------------------
+//
+//----------------------------------------------------- 
 std::string Camera::getParameter(std::string parameter)
 {
 	DEB_MEMBER_FUNCT();
@@ -1772,6 +1782,9 @@ std::string Camera::getParameter(std::string parameter)
 	return res.str();
 }
 
+//-----------------------------------------------------
+//
+//----------------------------------------------------- 
 void Camera::setParameter(std::string parameter, double value)
 {
 	DEB_MEMBER_FUNCT();
