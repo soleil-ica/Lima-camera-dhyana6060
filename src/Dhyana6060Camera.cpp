@@ -1754,29 +1754,29 @@ std::string Camera::getParameter(std::string parameter)
 		/* code */
 		break;
 	case TU_ElemBoolean:
-		res << node.nVal << std::endl;
+		res << node.nVal;
 		break;
 	case TU_ElemInteger:
-		res << node.nVal << std::endl;
+		res << node.nVal;
 		break;
 	case TU_ElemFloat:
-		res << node.dbVal << std::endl;
+		res << node.dbVal;
 		break;
 	case TU_ElemString:
-		res << node.pTransfer << std::endl;
+		res << node.pTransfer;
 		break;
 	case TU_ElemEnumeration:
-		res << node.nVal << std::endl;
+		res << node.nVal;
 		break;
 	case TU_ElemCommand:
-		res << node.nVal << std::endl;
+		res << node.nVal;
 		break;
 	case TU_ElemRegister:
 		/* code */
 		break;
 	
 	default:
-		res << "N/A" << std::endl;
+		res << "N/A";
 		break;
 	}
 	return res.str();
