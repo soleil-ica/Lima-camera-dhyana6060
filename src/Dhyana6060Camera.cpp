@@ -944,11 +944,15 @@ void Camera::checkBin(Bin &hw_bin)
 {
 	DEB_MEMBER_FUNCT();
 	//@BEGIN : check available values of binning H/V
+	std::vector<int> binningValues = {1, 2, 4};
+
 	int x = hw_bin.getX();
 	int y = hw_bin.getY();
-	if(x != 1 || y != 1)
+	if( !(std::find(binningValues.begin(), binningValues.end(), x) != binningValues.end() && 
+		std::find(binningValues.begin(), binningValues.end(), y) != binningValues.end()) ||
+		x != y)
 	{
-		DEB_ERROR() << "Binning values not supported";
+		DEB_ERROR() << "Binning values not supported.\n";
 		THROW_HW_ERROR(Error) << "Binning values not supported = " << DEB_VAR1(hw_bin);
 	}
 	//@END
@@ -956,13 +960,41 @@ void Camera::checkBin(Bin &hw_bin)
 	hw_bin = Bin(x, y);
 	DEB_RETURN() << DEB_VAR1(hw_bin);
 }
+
 //-----------------------------------------------------
 // @brief set the new binning mode
 //-----------------------------------------------------
 void Camera::setBin(const Bin &set_bin)
 {
 	DEB_MEMBER_FUNCT();
-	m_bin = set_bin;
+
+	TUCAMRET err;
+	TUCAM_ELEMENT node; // Property node
+
+	if (m_bin != set_bin)
+	{	
+		node.pName = "Binning";
+		if (set_bin.getX() == 1 && set_bin.getY() == 1)
+		{
+			node.nVal = 0; //BinOff
+		}
+		else if (set_bin.getX() == 2 && set_bin.getY() == 2)
+		{
+			node.nVal = 1;	//Bin2x2Sum
+		}
+		else if (set_bin.getX() == 4 && set_bin.getY() == 4)
+		{
+			node.nVal = 2;	//Bin4x4Sum
+		}
+		
+		err = TUCAM_GenICam_SetElementValue(m_opCam.hIdxTUCam, &node);
+		if(TUCAMRET_SUCCESS != err)
+		{
+			THROW_HW_ERROR(Error) << "Unable to set Binning from the camera ! Error: " << err << " ";
+		}
+
+		m_bin = set_bin;
+	}
 
 	DEB_RETURN() << DEB_VAR1(set_bin);
 }
@@ -974,10 +1006,37 @@ void Camera::getBin(Bin &hw_bin)
 {
 	DEB_MEMBER_FUNCT();
 	//@BEGIN : get binning from Driver/API
-	int bin_x = 1;
-	int bin_y = 1;
+
+	TUCAM_ELEMENT node; // Property node
+	int x, y;
+
+	// Get Binning
+	int err = TUCAM_GenICam_ElementAttr(m_opCam.hIdxTUCam, &node, "Binning");
+	if(TUCAMRET_SUCCESS != err)
+	{
+		THROW_HW_ERROR(Error) << "Unable to Read BinningHorizontal from the camera ! Error: " << err << " ";
+	}
+
+	switch (node.nVal)
+	{
+		case 0:
+			x = 2;
+			y = 2;
+			break;
+		case 0:
+			x = 4;
+			y = 4;
+			break;
+		case 0:
+		default:
+			x = 1;
+			y = 1;
+			break;
+	}
+
+	Bin tmp_bin(x, y);
+
 	//@END
-	Bin tmp_bin(bin_x, bin_y);
 
 	hw_bin = tmp_bin;
 	m_bin = tmp_bin;
